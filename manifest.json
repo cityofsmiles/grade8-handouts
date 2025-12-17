@@ -1,0 +1,17 @@
+{
+  "name": "Grade 8 Math Handouts",
+  "short_name": "MathG8",
+  "description": "Quarterly Math Handouts for Grade 8",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#4f46e5",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3426/3426653.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
