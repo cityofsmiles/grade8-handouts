@@ -125,7 +125,7 @@
 
             useEffect(() => {
                 const urlData = parseURL();
-                if (urlData) {
+                if (urlData && quarters.includes(urlData.quarter)) {
                     setSelectedQuarter(urlData.quarter);
                 } else {
                     fetchHandouts(selectedQuarter);
@@ -133,7 +133,8 @@
             }, []);
 
             useEffect(() => {
-                fetchHandouts(selectedQuarter);
+                const urlData = parseURL();
+                fetchHandouts(selectedQuarter, urlData);
             }, [selectedQuarter]);
 
             useEffect(() => {
@@ -142,7 +143,7 @@
                 }
             }, [currentIndex, selectedQuarter, handouts, loading]);
 
-            const fetchHandouts = async (quarter) => {
+            const fetchHandouts = async (quarter, urlData = null) => {
                 try {
                     setLoading(true);
                     setError(null);
@@ -173,8 +174,10 @@
                     setHandouts(data);
                     
                     // Check if URL has a specific handout index
-                    const urlData = parseURL();
-                    if (urlData && urlData.quarter === quarter && urlData.index < data.length) {
+                    if (!urlData) {
+                        urlData = parseURL();
+                    }
+                    if (urlData && urlData.quarter === quarter && urlData.index < data.length && urlData.index >= 0) {
                         setCurrentIndex(urlData.index);
                     } else {
                         setCurrentIndex(0);
