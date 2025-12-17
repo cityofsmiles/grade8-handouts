@@ -55,6 +55,16 @@
             </svg>
         );
 
+        const Share = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+        );
+
         const MathHandoutsApp = () => {
             const [currentIndex, setCurrentIndex] = useState(0);
             const [menuOpen, setMenuOpen] = useState(false);
@@ -62,14 +72,75 @@
             const [loading, setLoading] = useState(true);
             const [error, setError] = useState(null);
             const [selectedQuarter, setSelectedQuarter] = useState('1st');
+            const [showCopyNotif, setShowCopyNotif] = useState(false);
 
             const BASE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSKokexxJE7NAJWhovLtTQHszKtFAgTZ7Cw-IczbSU-1mrOnYEtJxtSkpI5mGQ9-wAUeU1j8_0Pes2W/pub";
 
             const quarters = ['1st', '2nd', '3rd', '4th'];
 
+            // Function to create URL-friendly slug from title
+            const createSlug = (title) => {
+                return title
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/(^-|-$)/g, '');
+            };
+
+            // Update URL when quarter or handout changes
+            const updateURL = (quarter, index) => {
+                if (handouts[index]) {
+                    const slug = createSlug(handouts[index].title);
+                    window.location.hash = `${quarter}-${index}-${slug}`;
+                }
+            };
+
+            // Parse URL and set initial state
+            const parseURL = () => {
+                const hash = window.location.hash.slice(1); // Remove #
+                if (hash) {
+                    const match = hash.match(/^(\dst)-(\d+)-/);
+                    if (match) {
+                        const quarter = match[1];
+                        const index = parseInt(match[2]);
+                        return { quarter, index };
+                    }
+                }
+                return null;
+            };
+
+            useEffect(() => {
+                // Handle browser back/forward buttons
+                const handleHashChange = () => {
+                    const urlData = parseURL();
+                    if (urlData && urlData.quarter === selectedQuarter) {
+                        if (urlData.index >= 0 && urlData.index < handouts.length) {
+                            setCurrentIndex(urlData.index);
+                        }
+                    }
+                };
+
+                window.addEventListener('hashchange', handleHashChange);
+                return () => window.removeEventListener('hashchange', handleHashChange);
+            }, [selectedQuarter, handouts]);
+
+            useEffect(() => {
+                const urlData = parseURL();
+                if (urlData) {
+                    setSelectedQuarter(urlData.quarter);
+                } else {
+                    fetchHandouts(selectedQuarter);
+                }
+            }, []);
+
             useEffect(() => {
                 fetchHandouts(selectedQuarter);
             }, [selectedQuarter]);
+
+            useEffect(() => {
+                if (handouts.length > 0 && !loading) {
+                    updateURL(selectedQuarter, currentIndex);
+                }
+            }, [currentIndex, selectedQuarter, handouts, loading]);
 
             const fetchHandouts = async (quarter) => {
                 try {
@@ -100,7 +171,15 @@
                     }
                     
                     setHandouts(data);
-                    setCurrentIndex(0);
+                    
+                    // Check if URL has a specific handout index
+                    const urlData = parseURL();
+                    if (urlData && urlData.quarter === quarter && urlData.index < data.length) {
+                        setCurrentIndex(urlData.index);
+                    } else {
+                        setCurrentIndex(0);
+                    }
+                    
                     setLoading(false);
                 } catch (err) {
                     setError("Failed to load handouts. Please check your internet connection.");
@@ -138,6 +217,14 @@
             const goToHandout = (index) => {
                 setCurrentIndex(index);
                 setMenuOpen(false);
+            };
+
+            const copyCurrentURL = () => {
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    setShowCopyNotif(true);
+                    setTimeout(() => setShowCopyNotif(false), 2000);
+                });
             };
 
             if (loading) {
@@ -187,6 +274,13 @@
 
             return (
                 <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+                    {/* Copy URL Notification */}
+                    {showCopyNotif && (
+                        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
+                            Link copied to clipboard!
+                        </div>
+                    )}
+
                     <header className="bg-indigo-600 text-white shadow-lg">
                         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                             <h1 className="text-2xl font-bold">Grade 8 Math Handouts</h1>
@@ -251,10 +345,18 @@
                         <main className="flex-1 p-4 lg:p-8">
                             <div className="max-w-4xl mx-auto">
                                 <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-                                    <div className="flex items-center gap-2 mb-2">
+                                    <div className="flex items-center justify-between mb-2">
                                         <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium">
                                             {selectedQuarter} Quarter
                                         </span>
+                                        <button
+                                            onClick={copyCurrentURL}
+                                            className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                                            title="Copy link to this handout"
+                                        >
+                                            <Share size={16} />
+                                            Share Link
+                                        </button>
                                     </div>
                                     <h2 className="text-xl font-semibold text-gray-800">
                                         {handouts[currentIndex].title}
