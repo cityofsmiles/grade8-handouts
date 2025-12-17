@@ -8,61 +8,38 @@
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
+        // --- Icons ---
         const ChevronLeft = ({ size = 24 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         );
-
         const ChevronRight = ({ size = 24 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         );
-
         const Menu = ({ size = 24 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         );
-
         const X = ({ size = 24 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         );
-
         const Loader = ({ size = 24, className = "" }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <line x1="12" y1="2" x2="12" y2="6"></line>
-                <line x1="12" y1="18" x2="12" y2="22"></line>
-                <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-                <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-                <line x1="2" y1="12" x2="6" y2="12"></line>
-                <line x1="18" y1="12" x2="22" y2="12"></line>
-                <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-                <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-            </svg>
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
         );
-
         const Share = ({ size = 24 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="18" cy="5" r="3"></circle>
-                <circle cx="6" cy="12" r="3"></circle>
-                <circle cx="18" cy="19" r="3"></circle>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-            </svg>
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
         );
 
         const MathHandoutsApp = () => {
@@ -71,74 +48,72 @@
             const [handouts, setHandouts] = useState([]);
             const [loading, setLoading] = useState(true);
             const [error, setError] = useState(null);
-            const [selectedQuarter, setSelectedQuarter] = useState('1st');
+            const [selectedQuarter, setSelectedQuarter] = useState(null); 
             const [showCopyNotif, setShowCopyNotif] = useState(false);
+            
+            const isInitialMount = useRef(true);
 
             const BASE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSKokexxJE7NAJWhovLtTQHszKtFAgTZ7Cw-IczbSU-1mrOnYEtJxtSkpI5mGQ9-wAUeU1j8_0Pes2W/pub";
-
             const quarters = ['1st', '2nd', '3rd', '4th'];
 
-            // Function to create URL-friendly slug from title
             const createSlug = (title) => {
-                return title
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/(^-|-$)/g, '');
+                return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
             };
 
-            // Update URL when quarter or handout changes
-            const updateURL = (quarter, index) => {
-                if (handouts[index]) {
-                    const slug = createSlug(handouts[index].title);
-                    window.location.hash = `${quarter}-${index}-${slug}`;
-                }
-            };
-
-            // Parse URL and set initial state
             const parseURL = () => {
-                const hash = window.location.hash.slice(1); // Remove #
+                const hash = window.location.hash.slice(1);
                 if (hash) {
-                    const match = hash.match(/^(\dst)-(\d+)-/);
+                    const match = hash.match(/^(\d[a-z]{2})-(\d+)-/);
                     if (match) {
-                        const quarter = match[1];
-                        const index = parseInt(match[2]);
-                        return { quarter, index };
+                        return { quarter: match[1], index: parseInt(match[2]) };
                     }
                 }
                 return null;
             };
 
+            const updateURL = (quarter, index) => {
+                if (handouts[index]) {
+                    const slug = createSlug(handouts[index].title);
+                    const newHash = `#${quarter}-${index}-${slug}`;
+                    if (window.location.hash !== newHash) {
+                        window.history.replaceState(null, null, newHash);
+                    }
+                }
+            };
+
+            // 1. Initial Load: Determine quarter from URL before fetching
             useEffect(() => {
-                // Handle browser back/forward buttons
+                const urlData = parseURL();
+                const initialQuarter = (urlData && quarters.includes(urlData.quarter)) ? urlData.quarter : '1st';
+                
+                setSelectedQuarter(initialQuarter);
+                fetchHandouts(initialQuarter, urlData);
+
                 const handleHashChange = () => {
-                    const urlData = parseURL();
-                    if (urlData && urlData.quarter === selectedQuarter) {
-                        if (urlData.index >= 0 && urlData.index < handouts.length) {
-                            setCurrentIndex(urlData.index);
-                        }
+                    const data = parseURL();
+                    if (data && data.quarter !== selectedQuarter) {
+                        setSelectedQuarter(data.quarter);
+                    } else if (data && data.index !== currentIndex) {
+                        setCurrentIndex(data.index);
                     }
                 };
 
                 window.addEventListener('hashchange', handleHashChange);
                 return () => window.removeEventListener('hashchange', handleHashChange);
-            }, [selectedQuarter, handouts]);
-
-            useEffect(() => {
-                const urlData = parseURL();
-                if (urlData && quarters.includes(urlData.quarter)) {
-                    setSelectedQuarter(urlData.quarter);
-                } else {
-                    fetchHandouts(selectedQuarter);
-                }
             }, []);
 
+            // 2. Fetch data when the quarter state changes (skip the very first mount logic)
             useEffect(() => {
-                const urlData = parseURL();
-                fetchHandouts(selectedQuarter, urlData);
+                if (isInitialMount.current) {
+                    isInitialMount.current = false;
+                } else if (selectedQuarter) {
+                    fetchHandouts(selectedQuarter);
+                }
             }, [selectedQuarter]);
 
+            // 3. Keep URL synced with navigation
             useEffect(() => {
-                if (handouts.length > 0 && !loading) {
+                if (handouts.length > 0 && !loading && selectedQuarter) {
                     updateURL(selectedQuarter, currentIndex);
                 }
             }, [currentIndex, selectedQuarter, handouts, loading]);
@@ -147,38 +122,29 @@
                 try {
                     setLoading(true);
                     setError(null);
-                    
                     const sheetUrl = `${BASE_SHEET_URL}?gid=${getGidForQuarter(quarter)}&single=true&output=csv`;
                     
                     const response = await fetch(sheetUrl);
-                    const csvText = await response.text();
+                    if (!response.ok) throw new Error("Network response was not ok");
                     
+                    const csvText = await response.text();
                     const rows = csvText.split('\n').filter(row => row.trim());
                     const data = [];
                     
                     for (let i = 1; i < rows.length; i++) {
                         const row = rows[i].trim();
-                        if (!row) continue;
-                        
                         const match = row.match(/^"([^"]*)","([^"]*)"$/) || row.match(/^([^,]*),(.*)$/);
                         if (match) {
-                            const title = match[1].trim();
-                            const imageUrl = match[2].trim();
-                            
-                            if (title && imageUrl) {
-                                data.push({ title, imageUrl });
-                            }
+                            data.push({ title: match[1].trim(), imageUrl: match[2].trim() });
                         }
                     }
                     
                     setHandouts(data);
                     
-                    // Check if URL has a specific handout index
-                    if (!urlData) {
-                        urlData = parseURL();
-                    }
-                    if (urlData && urlData.quarter === quarter && urlData.index < data.length && urlData.index >= 0) {
-                        setCurrentIndex(urlData.index);
+                    // If we have URL data for this specific quarter, use that index
+                    const targetData = urlData || parseURL();
+                    if (targetData && targetData.quarter === quarter && targetData.index < data.length && targetData.index >= 0) {
+                        setCurrentIndex(targetData.index);
                     } else {
                         setCurrentIndex(0);
                     }
@@ -190,47 +156,30 @@
                 }
             };
 
-            const getGidForQuarter = (quarter) => {
-                const gidMap = {
-                    '1st': '1537771396',
-                    '2nd': '341159409',
-                    '3rd': '1458047145',
-                    '4th': '0'
-                };
-                return gidMap[quarter];
+            const getGidForQuarter = (q) => {
+                const gidMap = { '1st': '1537771396', '2nd': '341159409', '3rd': '1458047145', '4th': '0' };
+                return gidMap[q];
             };
 
-            const changeQuarter = (quarter) => {
-                setSelectedQuarter(quarter);
-                setMenuOpen(false);
-            };
-
-            const goToNext = () => {
-                if (currentIndex < handouts.length - 1) {
-                    setCurrentIndex(currentIndex + 1);
+            const changeQuarter = (q) => {
+                if (q !== selectedQuarter) {
+                    setMenuOpen(false);
+                    setSelectedQuarter(q);
                 }
             };
 
-            const goToPrevious = () => {
-                if (currentIndex > 0) {
-                    setCurrentIndex(currentIndex - 1);
-                }
-            };
-
-            const goToHandout = (index) => {
-                setCurrentIndex(index);
-                setMenuOpen(false);
-            };
-
+            const goToNext = () => currentIndex < handouts.length - 1 && setCurrentIndex(currentIndex + 1);
+            const goToPrevious = () => currentIndex > 0 && setCurrentIndex(currentIndex - 1);
+            const goToHandout = (i) => { setCurrentIndex(i); setMenuOpen(false); };
+            
             const copyCurrentURL = () => {
-                const url = window.location.href;
-                navigator.clipboard.writeText(url).then(() => {
+                navigator.clipboard.writeText(window.location.href).then(() => {
                     setShowCopyNotif(true);
                     setTimeout(() => setShowCopyNotif(false), 2000);
                 });
             };
 
-            if (loading) {
+            if (loading || !selectedQuarter) {
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
                         <div className="text-center">
@@ -243,33 +192,10 @@
 
             if (error) {
                 return (
-                    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-                        <div className="text-center bg-white p-8 rounded-lg shadow-lg max-w-md">
-                            <p className="text-red-600 text-lg mb-4">{error}</p>
-                            <button
-                                onClick={() => fetchHandouts(selectedQuarter)}
-                                className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
-                            >
-                                Try Again
-                            </button>
-                        </div>
-                    </div>
-                );
-            }
-
-            if (handouts.length === 0) {
-                return (
-                    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
-                        <header className="bg-indigo-600 text-white shadow-lg">
-                            <div className="max-w-7xl mx-auto px-4 py-4">
-                                <h1 className="text-2xl font-bold">Grade 8 Math Handouts</h1>
-                            </div>
-                        </header>
-                        <div className="flex-1 flex items-center justify-center">
-                            <div className="text-center bg-white p-8 rounded-lg shadow-lg max-w-md">
-                                <p className="text-gray-600 text-lg mb-4">No handouts found for {selectedQuarter} Quarter.</p>
-                                <p className="text-gray-500 text-sm">Please add data to your Google Sheet for this quarter.</p>
-                            </div>
+                    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                        <div className="text-center p-8 bg-white shadow-lg rounded-xl">
+                            <p className="text-red-600 mb-4">{error}</p>
+                            <button onClick={() => fetchHandouts(selectedQuarter)} className="bg-indigo-600 text-white px-6 py-2 rounded-lg">Retry</button>
                         </div>
                     </div>
                 );
@@ -277,7 +203,6 @@
 
             return (
                 <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
-                    {/* Copy URL Notification */}
                     {showCopyNotif && (
                         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
                             Link copied to clipboard!
@@ -287,142 +212,71 @@
                     <header className="bg-indigo-600 text-white shadow-lg">
                         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                             <h1 className="text-2xl font-bold">Grade 8 Math Handouts</h1>
-                            <button
-                                onClick={() => setMenuOpen(!menuOpen)}
-                                className="p-2 hover:bg-indigo-700 rounded-lg transition-colors lg:hidden"
-                            >
+                            <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 hover:bg-indigo-700 rounded-lg lg:hidden">
                                 {menuOpen ? <X size={24} /> : <Menu size={24} />}
                             </button>
                         </div>
                     </header>
 
-                    <div className="flex-1 flex">
-                        <aside
-                            className={`${
-                                menuOpen ? 'translate-x-0' : '-translate-x-full'
-                            } fixed lg:relative lg:translate-x-0 z-20 w-80 bg-white shadow-xl transition-transform duration-300 ease-in-out h-full overflow-y-auto`}
-                        >
+                    <div className="flex-1 flex overflow-hidden">
+                        <aside className={`${menuOpen ? 'translate-x-0' : '-translate-x-full'} fixed lg:relative lg:translate-x-0 z-20 w-80 bg-white shadow-xl transition-transform duration-300 h-full overflow-y-auto`}>
                             <div className="p-4">
-                                <div className="mb-6">
-                                    <h2 className="text-lg font-semibold text-gray-800 mb-3">Select Quarter</h2>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {quarters.map((quarter) => (
-                                            <button
-                                                key={quarter}
-                                                onClick={() => changeQuarter(quarter)}
-                                                className={`p-3 rounded-lg font-medium transition-colors ${
-                                                    selectedQuarter === quarter
-                                                        ? 'bg-indigo-600 text-white'
-                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                }`}
-                                            >
-                                                {quarter} Quarter
-                                            </button>
-                                        ))}
-                                    </div>
+                                <h2 className="text-lg font-semibold text-gray-800 mb-3">Select Quarter</h2>
+                                <div className="grid grid-cols-2 gap-2 mb-6">
+                                    {quarters.map((q) => (
+                                        <button key={q} onClick={() => changeQuarter(q)} className={`p-3 rounded-lg font-medium transition-colors ${selectedQuarter === q ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700'}`}>
+                                            {q} Quarter
+                                        </button>
+                                    ))}
                                 </div>
-
-                                <div>
-                                    <h2 className="text-lg font-semibold text-gray-800 mb-3">
-                                        Lessons ({selectedQuarter} Quarter)
-                                    </h2>
-                                    <nav className="space-y-2">
-                                        {handouts.map((handout, index) => (
-                                            <button
-                                                key={index}
-                                                onClick={() => goToHandout(index)}
-                                                className={`w-full text-left p-3 rounded-lg transition-colors ${
-                                                    currentIndex === index
-                                                        ? 'bg-indigo-100 text-indigo-700 font-medium'
-                                                        : 'hover:bg-gray-100 text-gray-700'
-                                                }`}
-                                            >
-                                                <div className="text-sm">{handout.title}</div>
-                                            </button>
-                                        ))}
-                                    </nav>
-                                </div>
+                                <h2 className="text-lg font-semibold text-gray-800 mb-3">Lessons</h2>
+                                <nav className="space-y-1">
+                                    {handouts.map((h, i) => (
+                                        <button key={i} onClick={() => goToHandout(i)} className={`w-full text-left p-3 rounded-lg text-sm transition-colors ${currentIndex === i ? 'bg-indigo-100 text-indigo-700 font-bold' : 'hover:bg-gray-50 text-gray-700'}`}>
+                                            {h.title}
+                                        </button>
+                                    ))}
+                                </nav>
                             </div>
                         </aside>
 
-                        <main className="flex-1 p-4 lg:p-8">
+                        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
                             <div className="max-w-4xl mx-auto">
-                                <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                            {selectedQuarter} Quarter
-                                        </span>
-                                        <button
-                                            onClick={copyCurrentURL}
-                                            className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-                                            title="Copy link to this handout"
-                                        >
-                                            <Share size={16} />
-                                            Share Link
-                                        </button>
+                                <div className="bg-white rounded-lg shadow-md p-4 mb-4 flex justify-between items-start">
+                                    <div>
+                                        <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider">{selectedQuarter} Quarter</span>
+                                        <h2 className="text-xl font-bold text-gray-800 mt-2">{handouts[currentIndex]?.title}</h2>
+                                        <p className="text-sm text-gray-500 mt-1">Handout {currentIndex + 1} of {handouts.length}</p>
                                     </div>
-                                    <h2 className="text-xl font-semibold text-gray-800">
-                                        {handouts[currentIndex].title}
-                                    </h2>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        Handout {currentIndex + 1} of {handouts.length}
-                                    </p>
+                                    <button onClick={copyCurrentURL} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 text-sm font-bold bg-indigo-50 px-3 py-2 rounded-lg transition-colors">
+                                        <Share size={18} /> Share Link
+                                    </button>
                                 </div>
 
-                                <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
-                                    <img
-                                        src={handouts[currentIndex].imageUrl}
-                                        alt={handouts[currentIndex].title}
-                                        className="w-full h-auto rounded"
-                                    />
+                                <div className="bg-white rounded-lg shadow-xl p-2 mb-4">
+                                    <img src={handouts[currentIndex]?.imageUrl} alt={handouts[currentIndex]?.title} className="w-full h-auto rounded shadow-sm" />
                                 </div>
 
                                 <div className="flex items-center justify-between bg-white rounded-lg shadow-md p-4">
-                                    <button
-                                        onClick={goToPrevious}
-                                        disabled={currentIndex === 0}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                                            currentIndex === 0
-                                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                        }`}
-                                    >
-                                        <ChevronLeft size={20} />
-                                        Previous
+                                    <button onClick={goToPrevious} disabled={currentIndex === 0} className="flex items-center gap-2 px-6 py-2 rounded-lg font-bold bg-indigo-600 text-white disabled:bg-gray-200 disabled:text-gray-400">
+                                        <ChevronLeft size={20} /> Previous
                                     </button>
-
-                                    <span className="text-gray-600 font-medium">
-                                        {currentIndex + 1} / {handouts.length}
-                                    </span>
-
-                                    <button
-                                        onClick={goToNext}
-                                        disabled={currentIndex === handouts.length - 1}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                                            currentIndex === handouts.length - 1
-                                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                        }`}
-                                    >
-                                        Next
-                                        <ChevronRight size={20} />
+                                    <span className="text-gray-600 font-bold">{currentIndex + 1} / {handouts.length}</span>
+                                    <button onClick={goToNext} disabled={currentIndex === handouts.length - 1} className="flex items-center gap-2 px-6 py-2 rounded-lg font-bold bg-indigo-600 text-white disabled:bg-gray-200 disabled:text-gray-400">
+                                        Next <ChevronRight size={20} />
                                     </button>
                                 </div>
                             </div>
                         </main>
                     </div>
 
-                    {menuOpen && (
-                        <div
-                            className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
-                            onClick={() => setMenuOpen(false)}
-                        />
-                    )}
+                    {menuOpen && <div className="fixed inset-0 bg-black/50 z-10 lg:hidden" onClick={() => setMenuOpen(false)} />}
                 </div>
             );
         };
 
-        ReactDOM.render(<MathHandoutsApp />, document.getElementById('root'));
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MathHandoutsApp />);
     </script>
 </body>
 </html>
